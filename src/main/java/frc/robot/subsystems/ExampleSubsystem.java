@@ -112,6 +112,7 @@ public class ExampleSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     if (!enabled){
+      wheely.set(0.0);
       return;
     }
 
