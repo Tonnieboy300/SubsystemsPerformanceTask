@@ -181,7 +181,7 @@ public class ExampleSubsystem extends SubsystemBase implements Reportable{
         break;
       case ALL:
         SmartDashboard.putNumber("Current Speed", getCurrentSpeed());
-        SmartDashboard.putBoolean("At SPeed", atSpeed());
+        SmartDashboard.putBoolean("At Speed", atSpeed());
       case MEDIUM:
         SmartDashboard.putNumber("Target Speed", getTargetSpeed());
         SmartDashboard.putBoolean("Enabled", enabled);
