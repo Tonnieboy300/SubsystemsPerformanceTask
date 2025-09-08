@@ -4,13 +4,12 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import javax.crypto.interfaces.PBEKey;
-
-import org.ejml.dense.row.linsol.qr.AdjLinearSolverQr_FDRM;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -22,12 +21,14 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-public class ExampleSubsystem extends SubsystemBase {
+public class ExampleSubsystem extends SubsystemBase implements Reportable{
   private final TalonFX wheely;
   private TalonFXConfigurator wheelyConfigurator;
   private boolean enabled = false;
   private NeutralModeValue neutralMode = NeutralModeValue.Brake;
   private double desiredSpeed = 0.0;
+
+  private final LOG_LEVEL loggingLevel = LOG_LEVEL.MEDIUM;
   // private double desiredPosition = 0.0;
   // private final Follower followRequest;
   // private MotionMagicVoltage motionMagicRequest;
@@ -138,9 +139,57 @@ public class ExampleSubsystem extends SubsystemBase {
   public boolean atSpeed(){
     return wheely.get() >= desiredSpeed;
   }
-
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
+  }
+
+  //logging
+  @Override
+  public void initShuffleboard(LOG_LEVEL priority){
+    if (priority == LOG_LEVEL.OFF){
+      return;
+    }
+
+    ShuffleboardTab tab = Shuffleboard.getTab("Wheely");
+
+    switch (priority){
+      case OFF:
+        break;
+      case ALL:
+        tab.addDouble("Current Speed", () -> getCurrentSpeed());
+        tab.addBoolean("At Speed", () -> atSpeed());
+      case MEDIUM:
+        tab.addDouble("Target Speed", () -> getTargetSpeed());
+        tab.addBoolean("Enabled", () -> enabled);
+      case MINIMAL:
+        tab.addDouble("Current Voltage", () -> wheely.getMotorVoltage().getValueAsDouble());
+        tab.addDouble("Current Temperature", () -> wheely.getDeviceTemp().getValueAsDouble());
+
+        break;
+    }
+  }
+
+  @Override
+  public void reportToSmartDashboard(LOG_LEVEL priority){
+    if (priority == LOG_LEVEL.OFF){
+      return;
+    }
+
+    switch (priority){
+      case OFF:
+        break;
+      case ALL:
+        SmartDashboard.putNumber("Current Speed", getCurrentSpeed());
+        SmartDashboard.putBoolean("At SPeed", atSpeed());
+      case MEDIUM:
+        SmartDashboard.putNumber("Target Speed", getTargetSpeed());
+        SmartDashboard.putBoolean("Enabled", enabled);
+      case MINIMAL:
+        SmartDashboard.putNumber("Current Voltage", wheely.getMotorVoltage().getValueAsDouble());
+        SmartDashboard.putNumber("Current Temperature", wheely.getDeviceTemp().getValueAsDouble());
+
+        break;
+    }
   }
 }
